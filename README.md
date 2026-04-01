@@ -1,52 +1,73 @@
-# Aurum Oracle - Metal Prediction Market
+# AurumOracle
 
-A Next.js 14 + TypeScript application for an Algorand-based metal prediction market integrated with XPC tokens.
+AI-powered precious metals prediction market — built with React, Claude, and Algorand.
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Install & Setup (2 minutes)
 ```bash
+# Install dependencies
 npm install
-cp .env.example .env.local
-# Add your GOLDAPI_KEY to .env.local
-```
 
-### 2. Run Dev Server
-```bash
+# Start the API server (requires ANTHROPIC_API_KEY in .env)
+npm run server
+
+# Start the frontend (separate terminal)
 npm run dev
-# Visit http://localhost:3000
 ```
 
-That's it! The app runs with mock data and live prices from GoldAPI.io.
+Frontend: http://localhost:5173  
+API: http://localhost:3001
 
-## ✨ Features
+## Environment Variables
 
-- **Live Metal Prices** — Gold, Silver, Platinum, Palladium from GoldAPI.io
-- **Prediction Markets** — Bet on metal price movements  
-- **XPC Token System** — Earn tokens for correct predictions
-- **Algorand Integration** — On-chain comments, votes, and transactions (when contracts deployed)
-- **Real World Assets** — Trade Meld Gold (MCAU/MSOS) via Tinyman DEX
-- **Knowledge Hub** — Learn about precious metals and blockchain
-
-## 🏗️ Architecture
+Create a `.env` file in the project root:
 
 ```
-Frontend (Next.js 14)
-  ├─ TypeScript + Tailwind CSS
-  ├─ Zustand for state management
-  ├─ React Query for data fetching
-  └─ Algorand SDK integration
-
-APIs
-  ├─ [/api/prices] → GoldAPI.io + CoinGecko
-  ├─ [/api/markets] → Mock markets (PostgreSQL in production)
-  └─ [/api/nfd] → NFD resolution (coming soon)
-
-Smart Contracts (PyTeal)
-  ├─ XPC ASA (Algorand Standard Asset)  
-  ├─ Prediction Market Contract
-  └─ Treasury / Fee Distribution
+ANTHROPIC_API_KEY=your-api-key-here
+GOLDAPI_KEY=your-goldapi-key       # optional — falls back to static prices
+PORT=3001                          # optional
 ```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────┐
+│  Frontend (Vite + React + TypeScript)   │
+│  └─ App.tsx — single-file SPA          │
+│     ├─ Dashboard — live metal prices    │
+│     ├─ AI Predict — Claude streaming    │
+│     ├─ Learn — metals knowledge hub     │
+│     └─ About — project info & roadmap   │
+├─────────────────────────────────────────┤
+│  API Server (Express + TypeScript)      │
+│  └─ server.ts                          │
+│     ├─ POST /api/predict — Claude SSE   │
+│     └─ GET /api/prices — GoldAPI proxy  │
+└─────────────────────────────────────────┘
+```
+
+## Tech Stack
+
+- **React 18** + TypeScript — frontend
+- **Vite 5** — build tool
+- **Claude AI** — market analysis (streaming SSE)
+- **GoldAPI.io** — real-time metal prices
+- **Express** — API server
+- **Lucide React** — icons
+- **Algorand** — blockchain layer (roadmap)
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Type-check + production build |
+| `npm run preview` | Preview production build |
+| `npm run server` | Start Express API server |
+
+## License
+
+MIT
 
 ## 📋 Project Structure
 
