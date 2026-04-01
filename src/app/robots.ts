@@ -1,14 +1,14 @@
-import type { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/admin', '/api/'],
+        allow:     '/',
+        disallow:  ['/api/', '/premium/'],
       },
     ],
-    sitemap: 'https://www.aurumoracle.com/sitemap.xml',
+    sitemap: 'https://www.AurumOracle.com/sitemap.xml',
   }
 }

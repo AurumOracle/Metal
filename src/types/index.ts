@@ -1,95 +1,201 @@
-// Core types for Aurum Oracle platform
+// ── METALS & PRICES ───────────────────────────────────────────────────
 
-export type PricePoint = {
-  asset: 'MCAU' | 'MSOS' | 'PAXG' | 'XAUT' | 'SPOT_GOLD' | 'SPOT_SILVER'
-  price: number // per gram
+export const TROY_OZ_TO_GRAMS = 31.1035
+
+export type MetalSymbol =
+  | 'XAU' | 'XAG' | 'XPT' | 'XPD' | 'XRH' | 'XIR'
+  | 'Cu'  | 'Al'  | 'Zn'  | 'Ni'  | 'Pb'  | 'Sn'
+
+export type TokenSymbol = 'MCAU' | 'MSOS' | 'PAXG' | 'XAUT'
+
+export interface SpotPrice {
+  symbol:    string
+  priceUSD:  number          // per troy oz for metals, per gram for Meld tokens
+  change24h: number          // percentage
+  updatedAt: string          // ISO timestamp
+}
+
+export interface MeldTokenPrice {
+  symbol:      TokenSymbol
+  pricePerGram: number       // USD per gram  = spotTroyOz / TROY_OZ_TO_GRAMS
+  spotTroyOz:  number        // underlying spot price per troy oz
+  change24h:   number
+  asaId:       number        // Algorand Standard Asset ID
+  chain:       'algorand' | 'xrpl'
+}
+
+export const MELD_ASSETS: Record<'gold' | 'silver', Omit<MeldTokenPrice, 'pricePerGram' | 'spotTroyOz' | 'change24h'>> = {
+  gold:   { symbol: 'MCAU', asaId: 6547014,   chain: 'algorand' },
+  silver: { symbol: 'MSOS', asaId: 137594422, chain: 'algorand' },
+}
+
+export type TimeRange = '1D' | '1W' | '1M' | '3M' | '6M' | '1Y' | '5Y' | 'ALL'
+export type ChartView = 'line' | 'area' | 'bar'
+
+export interface OHLCV {
   timestamp: number
-  source: string
+  open:      number
+  high:      number
+  low:       number
+  close:     number
+  volume:    number
 }
 
-export type Market = {
-  id: string
-  question: string
-  closes_at: number
-  resolved_at?: number
-  outcome?: 'YES' | 'NO' | null
-  yes_pool: number
-  no_pool: number
-  status: 'OPEN' | 'CLOSED' | 'RESOLVED'
-  category: string
+// ── TRADE ─────────────────────────────────────────────────────────────
+
+export type TradeSide = 'buy' | 'sell'
+export type TradeAsset = 'gold' | 'silver'
+
+export interface TradeQuote {
+  asset:        TradeAsset
+  symbol:       TokenSymbol
+  side:         TradeSide
+  amountGrams:  number
+  amountTroyOz: number       // amountGrams / TROY_OZ_TO_GRAMS
+  spotPerGram:  number
+  spotPerTroyOz: number
+  subtotal:     number       // amountGrams * spotPerGram
+  platformFee:  number       // subtotal * 0.007  → xpc.algo treasury
+  meldFee:      number       // subtotal * 0.001  → Meld protocol
+  total:        number       // subtotal + platformFee + meldFee
+  feePercent:   0.007        // immutable
 }
 
-export type UserProfile = {
-  address: string
-  nfd?: string
-  xpc_balance: number
-  rank: 'Apprentice Assayer' | 'Junior Assayer' | 'Assayer' | 'Senior Assayer' | 'Master Assayer' | 'Alchemist' | 'Grand Alchemist' | 'Oracle of the Vault'
-  xp: number
-  streak: number
-  created_at: number
+export function buildQuote(
+  asset: TradeAsset,
+  side: TradeSide,
+  amountGrams: number,
+  spotTroyOz: number,
+): TradeQuote {
+  const symbol = asset === 'gold' ? 'MCAU' : 'MSOS'
+  const spotPerGram   = +(spotTroyOz / TROY_OZ_TO_GRAMS).toFixed(6)
+  const amountTroyOz  = +(amountGrams / TROY_OZ_TO_GRAMS).toFixed(6)
+  const subtotal      = +(amountGrams * spotPerGram).toFixed(6)
+  const platformFee   = +(subtotal * 0.007).toFixed(6)
+  const meldFee       = +(subtotal * 0.001).toFixed(6)
+  const total         = +(subtotal + platformFee + meldFee).toFixed(6)
+  return { asset, symbol, side, amountGrams, amountTroyOz, spotPerGram, spotPerTroyOz: spotTroyOz, subtotal, platformFee, meldFee, total, feePercent: 0.007 }
 }
 
-export type Comment = {
-  id: string
-  market_id: string
-  author: string
-  author_nfd?: string
-  vote: 'YES' | 'NO'
-  content: string
-  likes: number
-  txn_id: string
-  timestamp: number
-  replies?: Comment[]
+// ── PREDICTION MARKET ─────────────────────────────────────────────────
+
+export type MarketStatus = 'open' | 'closed' | 'resolved'
+export type VoteSide = 'yes' | 'no'
+
+export interface Market {
+  id:          string
+  question:    string
+  tag:         string
+  closesAt:    string        // ISO timestamp
+  status:      MarketStatus
+  yesPct:      number        // 0–100
+  noPct:       number
+  totalVotes:  number
+  xpcReward:   number        // XPC awarded on correct call
+  outcome?:    VoteSide      // set on resolution
+  algoTxId?:   string        // on-chain tx that resolved the market
 }
 
-export type Vote = {
-  id: string
-  market_id: string
-  user: string
-  vote: 'YES' | 'NO'
-  amount: number
-  timestamp: number
+export interface Vote {
+  marketId:    string
+  walletAddr:  string
+  nfdName?:    string        // e.g. "john.xpc.algo"
+  side:        VoteSide
+  stakeXPC:    number
+  txId:        string        // Algorand tx ID
+  timestamp:   string
 }
 
-export type TradeQuote = {
-  asset: 'MCAU' | 'MSOS'
-  amount: number // grams
-  price_per_gram: number
-  subtotal: number
-  platform_fee: number // 0.7%
-  protocol_fee: number // ~0.1%
-  total: number
-  slippage_percent: number
+export interface Comment {
+  id:          string
+  marketId:    string
+  walletAddr:  string
+  nfdName?:    string
+  rankBadge?:  string
+  voteSide?:   VoteSide      // shown alongside comment
+  body:        string
+  likes:       number
+  txId:        string        // Algorand tx ID (note field)
+  timestamp:   string
+  replies:     Comment[]
+  replyToId?:  string        // parent comment tx ID
 }
 
-export function buildQuote(asset: 'MCAU' | 'MSOS', grams: number, spotPrice: number): TradeQuote {
-  const price_per_gram = spotPrice
-  const subtotal = grams * price_per_gram
-  const platform_fee = subtotal * 0.007 // 0.7%
-  const protocol_fee = subtotal * 0.001 // ~0.1%
-  const total = subtotal + platform_fee + protocol_fee
+// ── IDENTITY ──────────────────────────────────────────────────────────
 
-  return {
-    asset,
-    amount: grams,
-    price_per_gram,
-    subtotal,
-    platform_fee,
-    protocol_fee,
-    total,
-    slippage_percent: 0.5,
+export interface NFDProfile {
+  name:         string        // e.g. "john.xpc.algo"
+  address:      string        // Algorand wallet address
+  avatarUrl?:   string
+  bio?:         string
+  twitter?:     string
+  website?:     string
+  verified:     boolean
+  isSegment:    boolean       // true if *.xpc.algo
+}
+
+export interface UserProfile {
+  walletAddress: string
+  nfd?:          NFDProfile
+  xpcBalance:    number
+  rank:          PlayerRank
+  totalXPC:      number       // all-time earned
+  predictionHistory: Vote[]
+}
+
+export type PlayerRank =
+  | 'Apprentice Assayer'
+  | 'Junior Assayer'
+  | 'Assayer'
+  | 'Senior Assayer'
+  | 'Master Assayer'
+  | 'Alchemist'
+  | 'Grand Alchemist'
+  | 'Oracle of the Vault'
+
+export const RANK_THRESHOLDS: Record<PlayerRank, number> = {
+  'Apprentice Assayer':  0,
+  'Junior Assayer':      250,
+  'Assayer':             750,
+  'Senior Assayer':      2000,
+  'Master Assayer':      5000,
+  'Alchemist':           12000,
+  'Grand Alchemist':     30000,
+  'Oracle of the Vault': 75000,
+}
+
+export function getRank(xpc: number): PlayerRank {
+  const ranks = Object.entries(RANK_THRESHOLDS) as [PlayerRank, number][]
+  return ranks.reduce((acc, [rank, threshold]) =>
+    xpc >= threshold ? rank : acc,
+    'Apprentice Assayer' as PlayerRank
+  )
+}
+
+// ── XPC TOKEN ─────────────────────────────────────────────────────────
+
+export interface XPCTokenStats {
+  totalSupply:   number       // 100_000_000
+  burned:        number
+  circulating:   number       // totalSupply - burned
+  priceUSD:      number
+  marketCapUSD:  number
+  saleProgress:  number       // 0–1 (fraction of public sale distributed)
+}
+
+// ── API RESPONSES ─────────────────────────────────────────────────────
+
+export interface ApiResponse<T> {
+  data:      T
+  timestamp: string
+  cached:    boolean
+}
+
+export interface PriceApiResponse {
+  metals:  SpotPrice[]
+  tokens:  MeldTokenPrice[]
+  ratios: {
+    goldSilver:  number
+    goldOil:     number
   }
 }
-
-export function getRank(xp: number): UserProfile['rank'] {
-  if (xp >= 50000) return 'Oracle of the Vault'
-  if (xp >= 40000) return 'Grand Alchemist'
-  if (xp >= 30000) return 'Alchemist'
-  if (xp >= 20000) return 'Master Assayer'
-  if (xp >= 10000) return 'Senior Assayer'
-  if (xp >= 5000) return 'Assayer'
-  if (xp >= 1000) return 'Junior Assayer'
-  return 'Apprentice Assayer'
-}
-
-export type TxSigner = (txns: any[]) => Promise<Uint8Array[]>

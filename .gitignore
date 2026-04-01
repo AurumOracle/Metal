@@ -45,3 +45,5 @@ Thumbs.db
 *.sublime-project
 *.log
 npm-debug.log*
+__pycache__/
+tsconfig.tsbuildinfo

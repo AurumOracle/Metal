@@ -1,278 +1,262 @@
-'use client'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 
-import { useState } from 'react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+export const metadata: Metadata = {
+  title:       'Learn · Aurum Oracle',
+  description: 'Gold and silver through history, culture, alchemy, and the blockchain. From ancient monetary systems to tokenised metals on Algorand.',
+}
 
-type Category = 'all' | 'history' | 'alchemy' | 'economics' | 'blockchain' | 'silver'
+// ── CONTENT DATA ──────────────────────────────────────────────────────
 
-const CATEGORIES: { id: Category; label: string; emoji: string }[] = [
-  { id: 'all', label: 'All', emoji: '📚' },
-  { id: 'history', label: 'History', emoji: '🏛️' },
-  { id: 'alchemy', label: 'Alchemy & Esoterica', emoji: '⚗️' },
-  { id: 'economics', label: 'Economics', emoji: '📊' },
-  { id: 'blockchain', label: 'Blockchain', emoji: '⛓️' },
-  { id: 'silver', label: 'Silver', emoji: '🪙' },
-]
+const FEATURED = {
+  title:   'Gold: 5,000 years of monetary history',
+  excerpt: 'From the Egyptian pharaohs who buried it, to the Roman denarius that funded an empire, to the Bretton Woods system that shaped the modern world — gold has been the constant thread through every monetary regime humanity has tried.',
+  tag:     'History',
+  readMin: 12,
+  slug:    'gold-5000-years',
+}
 
 const ARTICLES = [
   {
-    id: 'gold-history',
-    category: 'history',
-    title: 'Gold Through the Ages: 5,000 Years of Value',
-    excerpt:
-      'From ancient Egypt to modern central banks, gold has served as humanity\'s most enduring store of value. Explore the civilizations that shaped our relationship with the yellow metal.',
-    readTime: '8 min',
-    content: `Gold's story begins around 3000 BCE in ancient Egypt, where it was considered the flesh of the gods. The first known gold coins were minted in Lydia (modern Turkey) around 600 BCE, establishing gold as money.
-
-The Roman Empire's gold aureus became the world's first reserve currency. When Rome debased its coinage, inflation followed — a lesson repeated throughout history.
-
-The Gold Standard era (1870s-1971) pegged currencies to gold. Britain led with the pound sterling backed by gold reserves. The US followed in 1900. This system provided remarkable price stability — a dollar in 1900 bought roughly the same goods as a dollar in 1800.
-
-President Nixon ended the gold standard in 1971. Since then, gold has risen from $35/oz to over $3,000/oz, reflecting the erosion of fiat currency purchasing power.
-
-Today, central banks hold over 35,000 tonnes of gold reserves. In 2024 alone, central banks purchased over 1,000 tonnes — the highest in decades. Gold remains the ultimate safe haven.`,
+    tag:     'History',
+    title:   'The Roman gold standard and its collapse',
+    excerpt: 'The denarius began as 95% silver. By 275 AD it was 5%. The debasement that toppled Rome is being repeated in every fiat currency today.',
+    readMin: 8,
+    slug:    'roman-gold-standard',
   },
   {
-    id: 'gold-standard',
-    category: 'history',
-    title: 'The Rise and Fall of the Gold Standard',
-    excerpt:
-      'How gold backing shaped global economics for a century, why it was abandoned, and the modern debate about sound money versus monetary flexibility.',
-    readTime: '10 min',
-    content: `The classical gold standard (1870s-1914) was perhaps the most stable monetary system in history. Countries fixed their currencies to a specific weight of gold, ensuring that trade imbalances self-corrected through gold flows.
-
-World War I destroyed the system as nations printed money to fund the war. The interwar period saw failed attempts to restore it. The Bretton Woods Agreement (1944) created a modified gold standard — the US dollar was pegged to gold at $35/oz, and other currencies were pegged to the dollar.
-
-By the 1960s, the US was printing more dollars than its gold could back. France demanded gold for its dollar reserves. On August 15, 1971, Nixon "temporarily" suspended gold convertibility. It was never restored.
-
-The result: global fiat currencies. Since 1971, the US dollar has lost over 85% of its purchasing power. Gold, meanwhile, has risen 85x from $35 to ~$3,000. The debate between gold bugs and Keynesians continues to this day.`,
+    tag:     'Alchemy & Esoterica',
+    title:   "The alchemist's quest: gold as spiritual metaphor",
+    excerpt: 'The medieval alchemists were not merely seeking material gold. The transmutation of base metals was a map for the transformation of the self.',
+    readMin: 10,
+    slug:    'alchemy-gold-metaphor',
   },
   {
-    id: 'alchemy-gold',
-    category: 'alchemy',
-    title: 'The Alchemist\'s Dream: Transmutation & the Philosopher\'s Stone',
-    excerpt:
-      'Alchemy wasn\'t just proto-chemistry — it was a spiritual practice seeking transformation. The quest to turn lead into gold mirrors humanity\'s desire for perfection.',
-    readTime: '7 min',
-    content: `For over two millennia, alchemists pursued the Philosopher's Stone — a legendary substance that could transmute base metals into gold and grant eternal life. While never achieving literal transmutation, alchemy laid the foundations for modern chemistry.
-
-The great alchemists — Hermes Trismegistus, Jabir ibn Hayyan, Paracelsus, Isaac Newton — saw gold not merely as wealth but as spiritual perfection. The seven metals corresponded to seven planets: Gold/Sun, Silver/Moon, Mercury/Mercury, Copper/Venus, Iron/Mars, Tin/Jupiter, Lead/Saturn.
-
-The alchemical process (nigredo, albedo, citrinitas, rubedo) mirrors psychological transformation described by Carl Jung centuries later. The "gold" they sought was as much internal as external.
-
-Modern nuclear physics actually achieved transmutation in 1941 — bombarding mercury with neutrons to create gold. The cost far exceeds the gold's value, proving the alchemists were right: true gold cannot be cheaply manufactured.
-
-In the blockchain era, "digital alchemy" takes new form — transforming lines of code into tokenized gold, accessible to anyone with a wallet.`,
+    tag:     'Economics',
+    title:   'Bretton Woods: how the US dollar was backed by gold',
+    excerpt: 'In 1944, 44 nations agreed to peg their currencies to the dollar, which was pegged to gold at $35/oz. Nixon ended it in 1971. What happened next?',
+    readMin: 9,
+    slug:    'bretton-woods',
   },
   {
-    id: 'gold-economics',
-    category: 'economics',
-    title: 'Gold as an Inflation Hedge: Myth vs Reality',
-    excerpt:
-      'Does gold actually protect against inflation? Examining the data across decades to understand when and why gold works as a hedge — and when it doesn\'t.',
-    readTime: '9 min',
-    content: `Gold's reputation as an inflation hedge is well-earned but nuanced. Over very long periods (50+ years), gold has preserved purchasing power remarkably well. One ounce of gold bought a fine men's suit in ancient Rome — and still does today.
-
-However, over shorter periods, the relationship is complex. Gold surged during the high-inflation 1970s (from $35 to $850) but crashed in the deflationary early 1980s. It was flat from 1980-2000 despite moderate inflation.
-
-The real driver isn't inflation per se — it's real interest rates. When real rates (nominal rate minus inflation) are negative, gold thrives because the opportunity cost of holding gold (which pays no yield) disappears. When real rates are positive, gold struggles.
-
-Since 2020, massive monetary expansion, supply chain disruptions, and geopolitical tensions have pushed gold to all-time highs above $3,000/oz. Central bank purchases from China, India, and Turkey have added structural demand.
-
-For portfolio construction, a 5-15% gold allocation has historically improved risk-adjusted returns. Gold's low correlation to stocks and bonds makes it a genuine diversifier.`,
+    tag:     'Blockchain',
+    title:   'How MCAU works: Meld Gold on Algorand explained',
+    excerpt: 'Each MCAU token is backed by one gram of physical gold held in audited Australian vaults. Here is exactly how the redemption process works.',
+    readMin: 6,
+    slug:    'mcau-explained',
   },
   {
-    id: 'gold-silver-ratio',
-    category: 'economics',
-    title: 'The Gold-Silver Ratio: A 4,000-Year Trading Signal',
-    excerpt:
-      'The ratio of gold to silver prices has been tracked since ancient Mesopotamia. Learn how traders use this metric to identify when either metal is overvalued.',
-    readTime: '6 min',
-    content: `The gold-silver ratio tells you how many ounces of silver it takes to buy one ounce of gold. Throughout history, this ratio has been a powerful mean-reverting signal.
-
-Historical ratios: Ancient Egypt fixed it at 2.5:1. Rome set it at 12:1. The US Coinage Act of 1792 set it at 15:1. For most of modern history, it has averaged around 60:1.
-
-Extreme readings signal opportunity. When the ratio exceeds 80:1, silver is historically cheap relative to gold. When it drops below 40:1, gold is the better value. In March 2020, the ratio spiked to 125:1 — an all-time extreme — before silver rallied 140% over the next year.
-
-Aurum Oracle tracks this ratio in real-time. Our prediction markets let you bet on whether the ratio will contract or expand. Combined with Tinyman DEX trading of MCAU (tokenized gold), the full cycle from analysis to execution happens on-chain.`,
+    tag:     'Silver',
+    title:   'Silver\'s industrial role: why it is not just a monetary metal',
+    excerpt: 'Solar panels, EV batteries, 5G infrastructure, medical devices — silver demand from industry is structurally rising in ways gold demand is not.',
+    readMin: 7,
+    slug:    'silver-industrial',
   },
   {
-    id: 'blockchain-rwa',
-    category: 'blockchain',
-    title: 'Real-World Assets on Blockchain: Gold Goes Digital',
-    excerpt:
-      'How tokenization bridges physical gold vaults to your digital wallet. PAXG, XAUT, MCAU — understanding the tokenized gold landscape.',
-    readTime: '8 min',
-    content: `Tokenized gold represents a revolution in precious metals access. Each token is backed 1:1 by physical gold held in insured vaults, audited regularly, and redeemable for the underlying metal.
-
-Major tokenized gold products:
-• PAXG (Pax Gold) — Ethereum-based, backed by London Good Delivery bars at Brink's vaults. 1 PAXG = 1 troy ounce of gold.
-• XAUT (Tether Gold) — Ethereum-based, backed by gold in Swiss vaults. Similar 1:1 backing.
-• MCAU (Meld Gold) — Algorand-based, backed by gold from Australian refiners. 1 MCAU = 1 gram of gold.
-
-Why Algorand? Transaction finality in ~3.3 seconds, fees under $0.001, carbon-negative blockchain. Perfect for high-frequency trading of real-world assets.
-
-Meld Gold's MCAU enables gram-level gold ownership — you can own 0.5 grams of gold (~$50) without minimum buy-ins that traditional dealers require. Combined with Tinyman DEX liquidity, you get 24/7 trading that physical gold dealers can't match.
-
-Aurum Oracle integrates MCAU directly. Buy tokenized gold, use it as collateral in prediction markets, or simply hold it as a digital gold position.`,
+    tag:     'History',
+    title:   'The California Gold Rush and the birth of US financial markets',
+    excerpt: 'The 1848 discovery at Sutter\'s Mill did not just bring 300,000 people west. It created the banking infrastructure that became Wall Street.',
+    readMin: 11,
+    slug:    'california-gold-rush',
   },
   {
-    id: 'prediction-markets',
-    category: 'blockchain',
-    title: 'How Prediction Markets Work: The Wisdom of Crowds',
-    excerpt:
-      'Prediction markets aggregate information better than polls or experts. Learn the mechanics of YES/NO shares, probability prices, and market resolution.',
-    readTime: '7 min',
-    content: `Prediction markets work on a simple principle: people with knowledge are willing to bet on it. When enough informed participants trade, market prices converge on accurate probabilities.
-
-Mechanics:
-1. A question is posed: "Will gold exceed $3,200/oz by June 30?"
-2. YES and NO shares are created. Their prices always sum to $1.00.
-3. If YES trades at $0.65, the market prices a 65% probability of "yes."
-4. At resolution, correct shares pay $1.00. Incorrect shares pay $0.00.
-
-Why it works: People with inside knowledge, analytical skills, or unique data are incentivized to trade. A geologist who knows about a major gold discovery will buy YES shares on gold price markets. This information gets incorporated into the price.
-
-Academic research consistently shows prediction markets outperform polls, expert panels, and statistical models. The Iowa Electronic Markets predicted US presidential elections more accurately than polls 74% of the time.
-
-Aurum Oracle applies this to precious metals. Our markets cover spot prices, ratios, tokenized assets, and more. XPC tokens serve as the staking currency, and correct predictions earn rewards.`,
+    tag:     'Alchemy & Esoterica',
+    title:   'Gold in world religions: sacred metal across cultures',
+    excerpt: 'From the Ark of the Covenant to Hindu temple offerings, from Aztec sun worship to Buddhist iconography — why did every civilisation independently venerate gold?',
+    readMin: 9,
+    slug:    'gold-world-religions',
   },
   {
-    id: 'silver-industrial',
-    category: 'silver',
-    title: 'Silver: The Indispensable Industrial Metal',
-    excerpt:
-      'Silver\'s unique properties make it irreplaceable in electronics, solar panels, medicine, and emerging technologies. Why industrial demand is reshaping silver\'s future.',
-    readTime: '8 min',
-    content: `Silver is unique among precious metals: roughly 50% of annual demand is industrial, compared to less than 10% for gold. This dual nature as both investment and commodity creates fascinating dynamics.
-
-Key industrial uses:
-• Solar panels — Each panel uses ~20g of silver. With solar installations growing 30%+ annually, this alone consumes 140M+ oz/year.
-• Electronics — Silver has the highest electrical and thermal conductivity of any element. Every smartphone, laptop, and EV uses silver.
-• Medicine — Silver's antibacterial properties are used in wound dressings, water purification, and medical devices.
-• 5G infrastructure — Massive silver demand from 5G rollout.
-• EVs — Electric vehicles use 25-50g of silver each, 2-3x more than ICE vehicles.
-
-The supply squeeze: Silver mine production has been flat for a decade at ~800M oz/year. Industrial demand alone consumes 600M+ oz. Investment demand (coins, bars, ETFs) takes another 300M+ oz. The structural deficit is growing.
-
-MSOS (Meld Silver) tokenizes silver on Algorand at 1 token = 1 gram. Combined with Aurum Oracle's prediction markets, you can both trade and predict silver's trajectory.`,
+    tag:     'Blockchain',
+    title:   'NFD domains on Algorand: your on-chain identity',
+    excerpt: 'NF Domains are the Algorand equivalent of ENS on Ethereum. Here is how xpc.algo works, why segments matter, and how to mint yours.',
+    readMin: 5,
+    slug:    'nfd-domains-explained',
   },
   {
-    id: 'silver-gold-debate',
-    category: 'silver',
-    title: 'Silver vs Gold: Which Metal Wins in 2025?',
-    excerpt:
-      'Comparing risk-reward profiles, supply dynamics, and historical performance. The case for silver as the "poor man\'s gold" — and why it might outperform.',
-    readTime: '6 min',
-    content: `The gold vs silver debate is as old as money itself. Both are monetary metals, but their investment profiles differ significantly.
-
-Gold's advantages:
-• Central bank demand (35,000+ tonnes in reserves)
-• Lower volatility (~15% annualized)
-• Deeper liquidity
-• Pure monetary/store-of-value narrative
-
-Silver's advantages:
-• Higher beta — outperforms gold in bull markets (historically 2-3x)
-• Growing industrial demand (solar, EVs, 5G)
-• Supply deficit (production flat, demand rising)
-• More affordable entry point
-• Gold-silver ratio at historically elevated levels (>80:1)
-
-Historical pattern: In precious metals bull markets, gold leads first, then silver catches up with explosive moves. In, 2010-2011, gold rose 60% while silver rose 170%. The same pattern is emerging now.
-
-The smart money strategy: Use gold as a portfolio anchor (stability), and silver for asymmetric upside. A 70/30 gold-silver allocation has historically captured the best risk-adjusted returns.
-
-On Aurum Oracle, you can trade both MCAU and MSOS, predict their relative performance in our markets, and earn XPC tokens for accurate forecasts.`,
+    tag:     'Economics',
+    title:   'The gold/silver ratio: 500 years of data',
+    excerpt: 'Historically the ratio has averaged around 15:1. Today it sits near 94:1. Is silver dramatically undervalued, or has the world changed permanently?',
+    readMin: 8,
+    slug:    'gold-silver-ratio-history',
   },
 ]
 
+const TAG_COLORS: Record<string, string> = {
+  'History':           'bg-gold-dim text-gold border-gold',
+  'Alchemy & Esoterica': 'bg-[rgba(168,139,212,0.12)] text-[#A88BD4] border-[rgba(168,139,212,0.3)]',
+  'Economics':         'bg-[rgba(91,173,138,0.12)] text-up border-[rgba(91,173,138,0.3)]',
+  'Blockchain':        'bg-algo-dim text-algo border-algo',
+  'Silver':            'bg-[rgba(168,180,192,0.12)] text-silver border-[rgba(168,180,192,0.3)]',
+}
+
+const TOPICS = [
+  { label: 'All',                  key: 'all'      },
+  { label: 'History',              key: 'History'  },
+  { label: 'Alchemy',              key: 'Alchemy'  },
+  { label: 'Economics',            key: 'Economics'},
+  { label: 'Blockchain',           key: 'Blockchain'},
+  { label: 'Silver',               key: 'Silver'   },
+]
+
+const VIDEO_RESOURCES = [
+  {
+    title:   'Why gold never rusts — the chemistry of a noble metal',
+    channel: 'Royal Institution',
+    url:     'https://www.youtube.com/results?search_query=gold+chemistry+noble+metal',
+  },
+  {
+    title:   'The history of money — from barter to blockchain',
+    channel: 'Kurzgesagt',
+    url:     'https://www.youtube.com/results?search_query=history+of+money+kurzgesagt',
+  },
+  {
+    title:   'Algorand explained in 5 minutes',
+    channel: 'Algorand Foundation',
+    url:     'https://www.youtube.com/results?search_query=algorand+explained',
+  },
+]
+
+// ── PAGE ──────────────────────────────────────────────────────────────
+
 export default function LearnPage() {
-  const [category, setCategory] = useState<Category>('all')
-  const [expandedArticle, setExpandedArticle] = useState<string | null>(null)
-
-  const filtered =
-    category === 'all' ? ARTICLES : ARTICLES.filter((a) => a.category === category)
-
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900">
-      <Header />
+    <main className="min-h-screen bg-surface-base">
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gold-400">Knowledge Hub</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Deep dives into precious metals, blockchain technology, and market mechanics.
+      {/* Hero */}
+      <section className="border-b border-default px-8 py-12 bg-surface-raised">
+        <div className="max-w-4xl mx-auto">
+          <div className="label mb-3">Knowledge hub</div>
+          <h1 className="font-display text-4xl font-bold tracking-[0.1em] text-gold mb-4 leading-tight">
+            Gold, Silver &amp; the Blockchain
+          </h1>
+          <p className="text-[17px] font-light text-secondary leading-relaxed max-w-2xl">
+            Five thousand years of monetary history. Ancient alchemy. The economics of precious metals.
+            And how Algorand and Meld Gold are bringing it all on-chain.
           </p>
         </div>
+      </section>
 
-        {/* Category filter */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
+      <div className="max-w-4xl mx-auto px-8 py-10">
+
+        {/* Topic filter */}
+        <div className="flex gap-2 flex-wrap mb-10">
+          {TOPICS.map(t => (
             <button
-              key={cat.id}
-              onClick={() => setCategory(cat.id)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                category === cat.id
-                  ? 'bg-gold-500/10 text-gold-400 ring-1 ring-gold-500/30'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200'
-              }`}
+              key={t.key}
+              className="font-display text-[9px] tracking-[0.14em] uppercase px-3 py-1.5 rounded border border-default text-muted hover:border-gold hover:text-gold transition-all cursor-pointer"
             >
-              {cat.emoji} {cat.label}
+              {t.label}
             </button>
           ))}
         </div>
 
-        {/* Articles grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((article) => {
-            const isExpanded = expandedArticle === article.id
-            const catInfo = CATEGORIES.find((c) => c.id === article.category)
+        {/* Featured article */}
+        <article className="bg-surface-card border border-gold rounded-2xl p-8 mb-10 cursor-pointer hover:bg-surface-hover transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <span className={`text-[9px] font-display tracking-[0.14em] px-2.5 py-1 rounded border ${TAG_COLORS[FEATURED.tag]}`}>
+              {FEATURED.tag}
+            </span>
+            <span className="text-[11px] italic text-muted">Featured · {FEATURED.readMin} min read</span>
+          </div>
+          <h2 className="font-display text-2xl font-semibold tracking-[0.06em] text-gold mb-4 leading-snug">
+            {FEATURED.title}
+          </h2>
+          <p className="text-[15px] font-light text-secondary leading-relaxed mb-5">
+            {FEATURED.excerpt}
+          </p>
+          <span className="font-display text-[9px] tracking-[0.14em] uppercase text-gold hover:text-gold-lt transition-colors">
+            Read article →
+          </span>
+        </article>
 
-            return (
-              <article
-                key={article.id}
-                className={`rounded-lg border border-slate-700 bg-slate-800 transition-all ${
-                  isExpanded ? 'md:col-span-2 lg:col-span-3' : ''
-                }`}
-              >
-                <div className="p-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="rounded bg-slate-700 px-1.5 py-0.5 text-[10px] text-slate-400">
-                      {catInfo?.emoji} {catInfo?.label}
-                    </span>
-                    <span className="text-[10px] text-slate-500">{article.readTime}</span>
-                  </div>
-                  <h2 className="text-sm font-semibold text-slate-100">{article.title}</h2>
-                  <p className="mt-1 text-xs text-slate-400">{article.excerpt}</p>
-
-                  {isExpanded && (
-                    <div className="mt-4 space-y-3 border-t border-slate-700 pt-4">
-                      {article.content.split('\n\n').map((para, i) => (
-                        <p key={i} className="text-xs leading-relaxed text-slate-300">
-                          {para}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() =>
-                      setExpandedArticle(isExpanded ? null : article.id)
-                    }
-                    className="mt-3 text-xs font-medium text-gold-400 hover:text-gold-300"
-                  >
-                    {isExpanded ? '← Collapse' : 'Read more →'}
-                  </button>
-                </div>
-              </article>
-            )
-          })}
+        {/* Article grid */}
+        <div className="label mb-5">All articles</div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mb-12">
+          {ARTICLES.map(article => (
+            <article
+              key={article.slug}
+              className="bg-surface-card border border-default rounded-xl p-5 cursor-pointer hover:border-gold transition-colors group"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`text-[8px] font-display tracking-[0.14em] px-2 py-0.5 rounded border ${TAG_COLORS[article.tag] ?? 'bg-surface-hover text-muted border-default'}`}>
+                  {article.tag}
+                </span>
+                <span className="text-[10px] italic text-muted">{article.readMin} min</span>
+              </div>
+              <h3 className="font-display text-[14px] tracking-[0.04em] text-primary group-hover:text-gold transition-colors mb-2 leading-snug">
+                {article.title}
+              </h3>
+              <p className="text-[13px] font-light text-muted leading-relaxed">
+                {article.excerpt}
+              </p>
+            </article>
+          ))}
         </div>
-      </main>
 
-      <Footer />
-    </div>
+        {/* Video resources */}
+        <div className="label mb-5">Video resources</div>
+        <div className="space-y-3 mb-12">
+          {VIDEO_RESOURCES.map(v => (
+            <a
+              key={v.title}
+              href={v.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-surface-card border border-default rounded-xl px-5 py-4 hover:border-gold transition-colors group"
+            >
+              <div className="w-10 h-10 rounded-lg bg-[rgba(196,95,95,0.15)] border border-[rgba(196,95,95,0.3)] flex items-center justify-center flex-shrink-0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <polygon points="4,2 12,7 4,12" fill="#C45F5F" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-[13px] font-light text-primary group-hover:text-gold transition-colors">
+                  {v.title}
+                </div>
+                <div className="text-[11px] italic text-muted">{v.channel}</div>
+              </div>
+              <span className="ml-auto text-[11px] text-muted group-hover:text-gold transition-colors">↗</span>
+            </a>
+          ))}
+        </div>
+
+        {/* The esoteric corner */}
+        <div className="border border-[rgba(168,139,212,0.25)] rounded-2xl p-7 bg-[rgba(168,139,212,0.04)] mb-10">
+          <div className="label mb-3" style={{ color: '#A88BD4' }}>Esoteric &amp; alchemical</div>
+          <h3 className="font-display text-xl tracking-[0.08em] mb-3" style={{ color: '#A88BD4' }}>
+            The Philosopher's Stone — and why alchemists were onto something
+          </h3>
+          <p className="text-[14px] font-light text-secondary leading-relaxed mb-4">
+            The medieval alchemists believed lead could be transmuted into gold. They were wrong about the chemistry — but profoundly right about the metaphysics.
+            Every monetary system in history has been an attempt to transmute human labour into stored value.
+            Gold simply happened to be the best technology for that purpose for 5,000 years.
+            Blockchain may be the next iteration.
+          </p>
+          <p className="text-[14px] font-light text-secondary leading-relaxed">
+            The word <em className="text-primary">aurum</em> — gold in Latin — is also the root of <em className="text-primary">aurora</em>.
+            The dawn. The beginning. This platform takes its name from both.
+          </p>
+        </div>
+
+        {/* CTA - predict */}
+        <div className="text-center py-8 border-t border-default">
+          <div className="label mb-3">Ready to put your knowledge to work?</div>
+          <h3 className="font-display text-xl tracking-[0.08em] text-gold mb-3">
+            Join the prediction markets
+          </h3>
+          <p className="text-[14px] italic text-muted mb-5 max-w-md mx-auto">
+            Predict gold and silver price movements. Earn XPC tokens for correct calls.
+            All on-chain via Algorand. Your identity is your xpc.algo name.
+          </p>
+          <Link
+            href="/"
+            className="inline-block font-display text-[10px] tracking-[0.14em] uppercase px-6 py-3 rounded-xl border border-gold bg-gold-dim text-gold hover:bg-[rgba(201,168,76,0.22)] transition-all"
+          >
+            View prediction markets →
+          </Link>
+        </div>
+      </div>
+    </main>
   )
 }

@@ -117,47 +117,41 @@ def approval_program():
     # 10% burn on losing side (deflationary mechanic)
     burn_amount = WideRatio([user_stake, Int(10)], [Int(100)])
 
+    do_void_refund = Seq(
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.Payment,
+                TxnField.receiver: Txn.sender(),
+                TxnField.amount: user_stake,
+                TxnField.fee: Int(0),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
+    )
+
+    do_winner_payout = Seq(
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields(
+            {
+                TxnField.type_enum: TxnType.Payment,
+                TxnField.receiver: Txn.sender(),
+                TxnField.amount: payout,
+                TxnField.fee: Int(0),
+            }
+        ),
+        InnerTxnBuilder.Submit(),
+    )
+
     on_claim = Seq(
         Assert(App.globalGet(RESOLVED) == Int(1)),
         Assert(user_stake > Int(0)),
-        If(
-            outcome == Bytes("VOID"),
-            # Refund on void
-            Seq(
-                InnerTxnBuilder.Begin(),
-                InnerTxnBuilder.SetFields(
-                    {
-                        TxnField.type_enum: TxnType.Payment,
-                        TxnField.receiver: Txn.sender(),
-                        TxnField.amount: user_stake,
-                        TxnField.fee: Int(0),
-                    }
-                ),
-                InnerTxnBuilder.Submit(),
-            ),
-            If(
-                user_voted == outcome,
-                # Winner — gets proportional share of total pool
-                Seq(
-                    InnerTxnBuilder.Begin(),
-                    InnerTxnBuilder.SetFields(
-                        {
-                            TxnField.type_enum: TxnType.Payment,
-                            TxnField.receiver: Txn.sender(),
-                            TxnField.amount: payout,
-                            TxnField.fee: Int(0),
-                        }
-                    ),
-                    InnerTxnBuilder.Submit(),
-                ),
-                # Loser — stake is forfeited (10% burned)
-                Seq(
-                    # No payout for losers
-                    Approve(),
-                ),
-            ),
-        ),
-        # Clear user state
+        # VOID: full refund. Winner: proportional payout. Loser: no payment (stake forfeited).
+        If(outcome == Bytes("VOID"))
+        .Then(do_void_refund)
+        .ElseIf(user_voted == outcome)
+        .Then(do_winner_payout),
+        # Clear user stake regardless of outcome
         App.localPut(Txn.sender(), STAKE, Int(0)),
         Approve(),
     )
@@ -169,7 +163,7 @@ def approval_program():
         [Txn.application_id() == Int(0), on_create],
         [Txn.on_completion() == OnComplete.OptIn, on_opt_in],
         [Txn.on_completion() == OnComplete.CloseOut, Approve()],
-        [Txn.on_completion() == OnComplete.DeleteApplication, Assert(is_oracle)],
+        [Txn.on_completion() == OnComplete.DeleteApplication, Seq(Assert(is_oracle), Approve())],
         [method == Bytes("vote"), on_vote],
         [method == Bytes("resolve"), on_resolve],
         [method == Bytes("claim"), on_claim],

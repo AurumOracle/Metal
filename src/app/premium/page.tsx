@@ -1,157 +1,194 @@
-'use client'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
-import { useAurum } from '@/store'
+export const metadata: Metadata = {
+  title:       'Premium · Aurum Oracle',
+  description: 'Unlock real-time arb alerts, cross-chain spread monitoring, advanced backtesting, and the full data API. Aurum Oracle Premium.',
+}
 
-const TIERS = [
+const PLANS = [
   {
-    name: 'Free',
-    price: '0',
-    unit: '',
+    name:     'Free',
+    price:    '$0',
+    period:   'forever',
     highlight: false,
     features: [
-      'Spot prices (30s delay)',
-      '3 predictions per day',
-      'Basic line charts',
-      'Community comments',
-      'Apprentice Assayer rank',
+      'Live gold & silver prices',
+      'Precious & base metals data',
+      'Commodities vs gold comparison',
+      'Historical charts',
+      'Prediction markets (limited stake)',
+      'On-chain comments & voting',
+      'xpc.algo identity',
+      'Meld Gold trading (0.7% fee)',
     ],
-    cta: 'Current Plan',
-    disabled: true,
+    cta:      'Get started',
+    ctaHref:  '/',
   },
   {
-    name: 'Silver',
-    price: '500',
-    unit: 'XPC/mo',
+    name:     'Premium',
+    price:    '$29',
+    period:   'per month',
     highlight: true,
     features: [
-      'Real-time prices (<1s)',
-      'Unlimited predictions',
-      'Advanced charts & overlays',
-      'Priority comment placement',
-      'Historical data (1Y)',
-      'Email price alerts',
-      'Silver badge on profile',
-      'Access to /api endpoint',
+      'Everything in Free',
+      'Real-time arb spread alerts (push + email)',
+      'Cross-chain spread monitor (MCAU vs PAXG vs XAUT)',
+      'Strategy backtester — RBI framework',
+      'Full OHLCV data export (CSV, JSON)',
+      'Premium price feeds (30s refresh)',
+      'Advanced chart overlays + indicators',
+      'Prediction markets (unlimited stake)',
+      'Priority support',
+      'Reduced trade fee (0.5%)',
     ],
-    cta: 'Upgrade to Silver',
-    disabled: false,
+    cta:      'Start Premium',
+    ctaHref:  '#',
   },
   {
-    name: 'Gold',
-    price: '2,000',
-    unit: 'XPC/mo',
+    name:     'Enterprise',
+    price:    'Custom',
+    period:   'contact us',
     highlight: false,
     features: [
-      'Everything in Silver',
-      'WebSocket live feed',
-      'Full API access (1000 req/min)',
-      'Historical data (All time)',
-      'Custom price alerts',
-      'Gold leaderboard badge',
-      'Early market access (24h)',
-      'Governance proposals',
-      'Direct support channel',
+      'Everything in Premium',
+      'Bespoke data API (white-label ready)',
+      'WebSocket real-time price feed',
+      'Custom alert rules & webhooks',
+      'Execution infrastructure (Algorand + XRPL)',
+      'On-chain P&L reporting',
+      'Dedicated account manager',
+      'SLA guarantee',
+      'Trade fee 0.35%',
     ],
-    cta: 'Upgrade to Gold',
-    disabled: false,
+    cta:      'Contact us',
+    ctaHref:  'mailto:enterprise@AurumOracle.com',
+  },
+]
+
+const PREMIUM_FEATURES = [
+  {
+    title:   'Real-time arb alerts',
+    desc:    'Instant push notifications when MCAU, PAXG, or XAUT diverge from spot by your configured threshold. Email + webhook support.',
+    icon:    '◈',
+    color:   'text-up',
+  },
+  {
+    title:   'Cross-chain spread monitor',
+    desc:    'Live comparison of MCAU (Algorand) vs PAXG (Ethereum) vs XAUT (XRPL) vs spot gold. Updated every 30 seconds.',
+    icon:    '⬡',
+    color:   'text-algo',
+  },
+  {
+    title:   'RBI backtester',
+    desc:    'Research → Backtest → Incubate. Test strategies against historical tokenised metals data. Win rate, profit factor, Sharpe, max drawdown.',
+    icon:    '▲',
+    color:   'text-gold',
+  },
+  {
+    title:   'Full data export',
+    desc:    'Download any chart data as CSV or JSON. Historical OHLCV for all metals, tokenised prices, and spread data going back years.',
+    icon:    '↓',
+    color:   'text-silver',
   },
 ]
 
 export default function PremiumPage() {
-  const wallet = useAurum((s) => s.wallet)
-  const xpcBalance = useAurum((s) => s.xpc_balance)
-
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900">
-      <Header />
+    <main className="min-h-screen bg-surface-base">
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gold-400">Premium Plans</h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Unlock advanced features with XPC tokens. All payments are on-chain.
+      {/* Hero */}
+      <section className="border-b border-default px-8 py-12 bg-surface-raised">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="label mb-3">Aurum Oracle Premium</div>
+          <h1 className="font-display text-4xl font-bold tracking-[0.1em] text-gold mb-4 leading-tight">
+            The edge serious traders need
+          </h1>
+          <p className="text-[17px] font-light text-secondary leading-relaxed max-w-2xl mx-auto">
+            Real-time arb alerts. Cross-chain spread monitoring. Full backtesting framework.
+            Everything you need to find and act on tokenised metals opportunities.
           </p>
         </div>
+      </section>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {TIERS.map((tier) => (
+      <div className="max-w-5xl mx-auto px-8 py-10">
+
+        {/* Premium features highlight */}
+        <div className="label mb-5">What you unlock</div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-12">
+          {PREMIUM_FEATURES.map(f => (
+            <div key={f.title} className="bg-surface-card border border-default rounded-xl p-5">
+              <div className={`text-2xl mb-3 ${f.color}`}>{f.icon}</div>
+              <h3 className="font-display text-[13px] tracking-[0.06em] text-primary mb-2">{f.title}</h3>
+              <p className="text-[13px] font-light text-muted leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Pricing plans */}
+        <div className="label mb-5">Plans</div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-12">
+          {PLANS.map(plan => (
             <div
-              key={tier.name}
-              className={`rounded-lg border p-6 ${
-                tier.highlight
-                  ? 'border-gold-500/50 bg-gold-500/5 ring-1 ring-gold-500/20'
-                  : 'border-slate-700 bg-slate-800'
+              key={plan.name}
+              className={`rounded-2xl border p-6 flex flex-col ${
+                plan.highlight
+                  ? 'border-gold bg-gold-dim'
+                  : 'border-default bg-surface-card'
               }`}
             >
-              {tier.highlight && (
-                <span className="mb-3 inline-block rounded-full bg-gold-500/10 px-2 py-0.5 text-[10px] font-medium text-gold-400">
-                  Most Popular
-                </span>
+              {plan.highlight && (
+                <div className="label mb-3 text-gold">Most popular</div>
               )}
-              <h2 className="text-lg font-bold text-slate-100">{tier.name}</h2>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-3xl font-bold text-gold-400">{tier.price}</span>
-                {tier.unit && (
-                  <span className="text-xs text-slate-500">{tier.unit}</span>
-                )}
+              <div className="font-display text-[13px] tracking-[0.12em] text-muted mb-2 uppercase">
+                {plan.name}
               </div>
+              <div className="font-display text-3xl font-bold text-primary mb-0.5">
+                {plan.price}
+              </div>
+              <div className="text-[11px] italic text-muted mb-5">{plan.period}</div>
 
-              <ul className="mt-4 space-y-2">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs text-slate-300">
-                    <span className="mt-0.5 text-green-400">✓</span>
+              <ul className="space-y-2 flex-1 mb-6">
+                {plan.features.map(f => (
+                  <li key={f} className="flex items-start gap-2 text-[12px] text-secondary">
+                    <span className="text-up flex-shrink-0 mt-0.5">✓</span>
                     {f}
                   </li>
                 ))}
               </ul>
 
-              <button
-                disabled={tier.disabled || !wallet}
-                className={`mt-6 w-full rounded py-2 text-xs font-medium transition-colors ${
-                  tier.highlight
-                    ? 'bg-gold-500 text-slate-900 hover:bg-gold-400 disabled:opacity-50'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-50'
+              <a
+                href={plan.ctaHref}
+                className={`block text-center font-display text-[9px] tracking-[0.14em] uppercase py-3 rounded-xl border transition-all ${
+                  plan.highlight
+                    ? 'border-gold bg-[rgba(201,168,76,0.2)] text-gold hover:bg-[rgba(201,168,76,0.32)]'
+                    : 'border-default text-muted hover:border-gold hover:text-gold'
                 }`}
               >
-                {!wallet ? 'Connect Wallet' : tier.cta}
-              </button>
+                {plan.cta}
+              </a>
             </div>
           ))}
         </div>
 
-        {wallet && (
-          <div className="mt-6 text-center">
-            <p className="text-xs text-slate-500">
-              Your balance: <span className="font-medium text-gold-400">{xpcBalance.toLocaleString()} XPC</span>
-            </p>
-          </div>
-        )}
-
-        <div className="mt-8 rounded-lg border border-slate-700 bg-slate-800 p-4 text-center">
-          <h3 className="mb-2 text-sm font-semibold text-slate-200">How Premium Works</h3>
-          <div className="grid gap-4 text-xs text-slate-400 md:grid-cols-3">
-            <div>
-              <span className="text-lg">1️⃣</span>
-              <p className="mt-1">Hold XPC tokens in your wallet</p>
-            </div>
-            <div>
-              <span className="text-lg">2️⃣</span>
-              <p className="mt-1">Sign a transaction to subscribe</p>
-            </div>
-            <div>
-              <span className="text-lg">3️⃣</span>
-              <p className="mt-1">XPC is locked in the premium contract for the month</p>
-            </div>
-          </div>
-          <p className="mt-3 text-[10px] text-slate-500">
-            50% of premium XPC is burned. 50% goes to the community rewards pool.
+        {/* Enterprise CTA */}
+        <div className="border border-default rounded-2xl p-8 text-center">
+          <div className="label mb-3">Financial sector clients</div>
+          <h3 className="font-display text-xl tracking-[0.08em] text-primary mb-3">
+            Enterprise data &amp; execution
+          </h3>
+          <p className="text-[14px] font-light text-muted leading-relaxed max-w-2xl mx-auto mb-5">
+            Treasury teams, family offices, commodity traders and fintechs building on Algorand or XRPL —
+            contact us for bespoke API access, white-label data feeds, and execution infrastructure.
           </p>
+          <a
+            href="mailto:enterprise@AurumOracle.com"
+            className="inline-block font-display text-[10px] tracking-[0.14em] uppercase px-6 py-3 rounded-xl border border-gold bg-gold-dim text-gold hover:bg-[rgba(201,168,76,0.22)] transition-all"
+          >
+            Contact enterprise team →
+          </a>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </main>
   )
 }

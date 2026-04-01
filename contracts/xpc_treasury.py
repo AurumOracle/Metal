@@ -159,7 +159,7 @@ def approval_program():
         [Txn.application_id() == Int(0), on_create],
         [Txn.on_completion() == OnComplete.OptIn, on_opt_in],
         [Txn.on_completion() == OnComplete.CloseOut, Approve()],
-        [Txn.on_completion() == OnComplete.DeleteApplication, Assert(is_admin)],
+        [Txn.on_completion() == OnComplete.DeleteApplication, Seq(Assert(is_admin), Approve())],
         [method == Bytes("subscribe"), on_subscribe],
         [method == Bytes("distribute"), on_distribute],
         [method == Bytes("burn"), on_burn],

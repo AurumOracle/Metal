@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── DESIGN TOKENS ────────────────────────────────────────── */
+:root {
+  --gold:        #C9A84C;
+  --gold-lt:     #E8C97A;
+  --silver:      #A8B4C0;
+  --algo:        #00B4D8;
+  --up:          #5BAD8A;
+  --down:        #C45F5F;
+  --surface-base:   #0B0B0D;
+  --surface-raised: #141416;
+  --surface-card:   #181820;
+  --surface-hover:  #1E1E28;
+  --border:      rgba(255,255,255,0.06);
+  --border-gold: rgba(201,168,76,0.20);
+  --border-algo: rgba(0,180,216,0.20);
+  --text-primary:   #EDE8DE;
+  --text-secondary: #9A9590;
+  --text-muted:     #5E5A56;
+}
+
+/* ── BASE ─────────────────────────────────────────────────── */
+html { font-size: 15px; }
+body {
+  background-color: var(--surface-base);
+  color: var(--text-primary);
+  font-family: 'Crimson Pro', Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 3px; height: 3px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--surface-hover); border-radius: 2px; }
+
+/* ── TYPOGRAPHY UTILITIES ─────────────────────────────────── */
+@layer utilities {
+  .font-display { font-family: 'Cinzel', serif; }
+  .font-body    { font-family: 'Crimson Pro', Georgia, serif; }
+
+  .text-gold     { color: var(--gold); }
+  .text-gold-lt  { color: var(--gold-lt); }
+  .text-silver   { color: var(--silver); }
+  .text-algo     { color: var(--algo); }
+  .text-up       { color: var(--up); }
+  .text-down     { color: var(--down); }
+  .text-primary  { color: var(--text-primary); }
+  .text-secondary{ color: var(--text-secondary); }
+  .text-muted    { color: var(--text-muted); }
+
+  .bg-surface-base   { background-color: var(--surface-base); }
+  .bg-surface-raised { background-color: var(--surface-raised); }
+  .bg-surface-card   { background-color: var(--surface-card); }
+  .bg-surface-hover  { background-color: var(--surface-hover); }
+
+  .border-default { border-color: var(--border); }
+  .border-gold    { border-color: var(--border-gold); }
+  .border-algo    { border-color: var(--border-algo); }
+  .border-up      { border-color: rgba(91,173,138,0.30); }
+  .border-down    { border-color: rgba(196,95,95,0.30); }
+
+  .label-caps {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .bg-gold-dim  { background-color: rgba(201,168,76,0.12); }
+  .bg-algo-dim  { background-color: rgba(0,180,216,0.10); }
+  .bg-up-dim    { background-color: rgba(91,173,138,0.12); }
+  .bg-down-dim  { background-color: rgba(196,95,95,0.12); }
+
+  /* Live indicator dot */
+  .live-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background-color: var(--algo);
+    animation: blink 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .live-dot-gold {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background-color: var(--gold);
+    animation: blink 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+}
+
+/* ── COMPONENT BASE CLASSES ───────────────────────────────── */
+@layer components {
+
+  /* Card */
+  .card {
+    @apply bg-surface-card border border-default rounded-xl;
+  }
+
+  /* Label */
+  .label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Button variants */
+  .btn-gold {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-gold);
+    background-color: rgba(201,168,76,0.12);
+    color: var(--gold);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-gold:hover {
+    background-color: rgba(201,168,76,0.22);
+    border-color: rgba(201,168,76,0.4);
+  }
+
+  .btn-buy {
+    background-color: rgba(91,173,138,0.14);
+    color: var(--up);
+    border: 1px solid rgba(91,173,138,0.30);
+  }
+  .btn-buy:hover { background-color: rgba(91,173,138,0.24); }
+
+  .btn-sell {
+    background-color: rgba(196,95,95,0.14);
+    color: var(--down);
+    border: 1px solid rgba(196,95,95,0.30);
+  }
+  .btn-sell:hover { background-color: rgba(196,95,95,0.24); }
+
+  /* Pill */
+  .pill {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-style: italic;
+  }
+  .pill-up   { @apply bg-up-dim text-up; }
+  .pill-down { @apply bg-down-dim text-down; }
+  .pill-flat { background-color: rgba(255,255,255,0.05); color: var(--text-muted); }
+
+  /* Divider */
+  .divider { border-top: 1px solid var(--border); }
+}

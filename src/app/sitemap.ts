@@ -1,13 +1,13 @@
-import type { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.aurumoracle.com'
-
+  const base = 'https://www.AurumOracle.com'
+  const now  = new Date().toISOString()
   return [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
-    { url: `${baseUrl}/learn`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/token`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/premium`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${baseUrl}/sale`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    { url: base,              lastModified: now, changeFrequency: 'hourly',  priority: 1.0 },
+    { url: `${base}/learn`,   lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
+    { url: `${base}/token`,   lastModified: now, changeFrequency: 'weekly',  priority: 0.9 },
+    { url: `${base}/sale`,    lastModified: now, changeFrequency: 'daily',   priority: 0.8 },
+    { url: `${base}/premium`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
   ]
 }
